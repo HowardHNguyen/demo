@@ -76,6 +76,30 @@ Patients are partitioned once, with outcome stratification and no patient overla
 
 Numeric imputation, scaling, categorical imputation, and encoding are fitted using training data only. Two predefined candidates are compared: L2 logistic regression and histogram gradient boosting. Logistic regression is selected by validation AUROC: **0.761**, versus **0.753** for gradient boosting. The threshold, **0.1860**, maximizes validation Youden J; it is an experimental classification threshold, not a clinical action threshold.
 
+### Which machine-learning models are implemented?
+
+| Model | Current status and role | Validation AUROC |
+|---|---|---:|
+| **L2 Logistic Regression** | Implemented and selected; an interpretable baseline using regularization | **0.761** |
+| **Histogram Gradient Boosting** | Implemented challenger; boosted decision trees capture nonlinear relationships | **0.753** |
+| **Random Forest (RF)** | Not implemented; proposed candidate for future real-data comparison | Not evaluated |
+| **XGBoost (XGB)** | Not implemented; proposed candidate for future real-data comparison | Not evaluated |
+
+Both implemented models use scikit-learn in the offline research pipeline. Histogram Gradient Boosting and XGBoost belong to the broad family of boosted-tree methods, but they are different implementations; this demo does not currently use XGBoost.
+
+Logistic Regression won the validation comparison and was then evaluated on the separate 1,000-patient test set, achieving **AUROC 0.714** and **accuracy 67.3%**. These results describe artificial outcomes in the synthetic cohort, not clinical accuracy on real patients.
+
+| Application area | Calculation or model used |
+|---|---|
+| **Risk Calculator** | Published Framingham 2008 equation applied to eligible patient inputs |
+| **Risk Over Time** | Saved assessment results and input snapshots from the reference calculator |
+| **What-If** | The same reference equation recalculated with hypothetical inputs |
+| **Research Lab** | Reports the separate synthetic ML experiment and selected Logistic Regression results |
+
+The synthetic-trained model is **not used for patient-facing risk calculations**. The Framingham equation was not fitted or retrained on these 5,000 records.
+
+For future real-data development, the proposed comparison includes Logistic Regression, Random Forest, and XGBoost alongside an appropriate published clinical reference. Selection should consider independent validation, calibration, clinical usefulness, and operational requirements; no algorithm is assumed to win. Cardiovascular, kidney, and metabolic predictions need separately defined outcomes and suitable predictors, rather than one universal score that automatically uses all 53 attributes. These additional models are a research plan, not an implemented feature or a commitment to clinical deployment.
+
 ### Measured test results — synthetic experiment only
 
 | Metric | Held-out test result |
