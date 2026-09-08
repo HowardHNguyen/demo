@@ -85,3 +85,15 @@ Machine-generated build caches, `node_modules`, Git history, local browser chang
 - https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf
 
 Future research imports should use adapters to the normalized schema, retain original values and units, and separate baseline predictors from outcomes. Clinical deployment needs validated models, authentication, access controls, secure storage, audit trails and an approved clinical workflow beyond this demonstration.
+
+## September 2026 feature update
+
+The Azure demo includes the original VitalCKM logo and brand palette from the `cardio-app` repository, a separate fictional Risk Calculator workspace, saved Risk Over Time snapshots, What-If comparisons, and a Resources reader with the three original planning documents and Markdown downloads.
+
+The calculator uses **Framingham 2008 general CVD, lipid-based equation**, not the cardio application's trained stacked model or approximate JavaScript fallback. Its coefficients are transcribed from the Framingham Heart Study's published risk function. It is restricted to ages 30–74 without established CVD; acute illness is also blocked as a demo precaution. The UI labels hypothetical comparisons as sensitivity analysis rather than treatment effects. Context-only measurements do not alter the score. No locally trained model or clinical accuracy/AUC is claimed. Earlier planning documents describe the previous release; their original text is retained alongside a current-release notice.
+
+Source: https://www.framinghamheartstudy.org/fhs-for-researchers/fhs-risk-functions/cardiovascular-disease-10-year-risk/
+
+Risk assessments are independent fictional profiles, not inferred from incomplete patient-directory measurements. They use a separate versioned local-storage key. History records store the input snapshot and model version. The comparison workspace does not alter saved assessments. Print / Save PDF uses the browser print dialog. Clinical production still requires the validation and infrastructure described in Resources.
+
+Validation: 15 automated tests (including reference values, eligibility, invalid inputs, scenario consistency and stored-data validation), TypeScript checking and the Azure export build passed. Automated tests verify software behavior, not clinical prediction performance. This change was not subjected to a full interactive browser or load-test suite.

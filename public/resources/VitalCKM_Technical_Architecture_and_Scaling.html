@@ -1,0 +1,305 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VitalCKM Technical Architecture and Scaling</title><style>body{font:16px/1.7 system-ui,sans-serif;color:#10192b;max-width:1000px;margin:auto;padding:24px}h1,h2,h3{line-height:1.25;color:#10192b}h1{font-size:2rem}h2{margin-top:2em}a{color:#025bcd}table{display:block;overflow:auto;border-collapse:collapse;font-size:14px;margin:24px 0}th,td{border:1px solid #dbe2f0;padding:10px;text-align:left;min-width:110px}th{background:#eef3fc}pre{overflow:auto;padding:18px;background:#eef1f8;font-size:13px}blockquote{border-left:3px solid #6f1eb8;padding-left:16px}.release{background:#e5f2fd;padding:16px;border-radius:8px;font-size:14px}@media print{body{max-width:none;padding:0}table{display:table;font-size:10px}th,td{min-width:0}pre{white-space:pre-wrap}a{color:inherit}}</style></head><body><aside class="release">Planning baseline document. The current Azure demo also includes an educational Framingham 2008 reference calculator. Statements about disabled percentages describe the earlier release; no local clinical accuracy or AUC has been established.</aside><h1 id="vitalckm-technical-architecture-and-scaling-brief">VitalCKM technical architecture and scaling brief</h1>
+<p>Prepared 7 September 2026. This describes the inspected demo and a proposed production architecture. Proposed services, integrations, performance objectives and controls are not implemented or benchmarked unless explicitly marked current.</p>
+<h2 id="current-system">Current system</h2>
+<p>The UI is a React 19.2.6 / TypeScript application using Vinext 1.0.0-beta.5 and Vite 8.0.13, with Tailwind styling and Base UI/Shadcn primitives. It can run on a local Node development server. Its build scaffold supports a Cloudflare Worker deployment; that support is not a production healthcare architecture or certification.</p>
+<table>
+<thead>
+<tr>
+<th>Current module</th>
+<th>Responsibility</th>
+<th>Limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app/page.tsx</code></td>
+<td>Screens, forms, role preview and record changes</td>
+<td>Large combined component; split by workflow before substantial expansion</td>
+</tr>
+<tr>
+<td><code>lib/demo.ts</code></td>
+<td>8 deterministic synthetic patients, 270 observations, 9 medication entries, 16 tasks; latest-result selection and basic validation</td>
+<td>Not a general hospital data model or ingestion service</td>
+</tr>
+<tr>
+<td><code>lib/clinical.ts</code></td>
+<td>BMI, CKD-EPI 2021 reference eGFR, UACR conversion and G/A categories</td>
+<td>Fixed calculations only; no clinical outcome model</td>
+</tr>
+<tr>
+<td>Browser localStorage</td>
+<td>Saves demo records under one browser origin</td>
+<td>No tenant isolation, shared database, durable audit history or server validation</td>
+</tr>
+<tr>
+<td>Role switch</td>
+<td>Previews patient and clinician perspectives</td>
+<td>Not authentication or authorization</td>
+</tr>
+<tr>
+<td>JSON download and browser printing</td>
+<td>Local selected-record export and visible-view printing</td>
+<td>Not EHR write-back or a hospital document service</td>
+</tr>
+<tr>
+<td>Optional WebMCP registration</td>
+<td>Lists/opens demo patients in a supporting browser</td>
+<td>Unverified optional interface; not a hospital API or security control</td>
+</tr>
+</tbody>
+</table>
+<p>Nine automated tests, TypeScript checking and production compilation passed. Comprehensive UI/accessibility tests, load tests and clinical validation remain outstanding. The installer reported 11 dependency advisories, including 8 high-severity reports; affected components and deployment exposure were not fully triaged. Audit and resolve relevant issues before production use. Reassess the beta framework's support and upgrade path rather than assuming the demo framework must be retained indefinitely.</p>
+<h2 id="recommended-evolution">Recommended evolution</h2>
+<p>Retain the useful UI and domain concepts. Replace the browser-local record store and role simulation with server-backed application services. Start with a modular application rather than many microservices. Isolate integration jobs and model inference where operational or security boundaries justify it.</p>
+<pre><code class="language-mermaid">flowchart LR
+  U[Clinician and patient web clients] --&gt; I[Identity and authorization]
+  U --&gt; A[Application API]
+  I --&gt; A
+  E[Hospital EHR and laboratory systems] --&gt; G[Hospital integration gateway]
+  G --&gt; Q[Queue and validation]
+  Q --&gt; D[Clinical data store]
+  A --&gt; D
+  A --&gt; M[Versioned clinical calculation and inference service]
+  M --&gt; R[Approved model registry]
+  M --&gt; D
+  A --&gt; T[Append-only audit events]
+  G --&gt; T
+  D --&gt; X[Approved research extraction]
+  X --&gt; L[Isolated training and evaluation environment]
+  L --&gt; R
+</code></pre>
+<p>This is a proposed architecture. Hosting location, network boundaries and data flows must be approved with each healthcare organization. A public edge frontend may be appropriate without placing the clinical database or training data there. Hospital-resident or approved regional services can expose authenticated HTTPS APIs. A Sites/Workers frontend must not attempt raw TCP/MLLP connectivity; terminate legacy hospital interfaces in an appropriate gateway and forward through approved HTTP interfaces.</p>
+<h3 id="application-and-storage-design">Application and storage design</h3>
+<ul>
+<li>Split UI features into patient directory, overview, observations, medication reconciliation, care plans, check-ins and methods. Extract typed services and hooks from page-level state.</li>
+<li>Define versioned API contracts, server validation and domain types independently of the UI. Use explicit error codes for unavailable, stale, invalid and ineligible inputs.</li>
+<li>Use a durable relational store, such as an approved PostgreSQL deployment, for patient-linked records. This is a proposed engineering choice, not a requirement imposed by FHIR.</li>
+<li>Every record and query must have an authorized organization/tenant context. Enforce access in the API and database layer where appropriate. Do not trust a browser-provided patient or tenant ID without an authorization check.</li>
+<li>Keep direct identity linkage in a restricted service/table. Use institution-scoped identifiers and a managed matching process; never merge people merely because names or birth dates resemble one another.</li>
+<li>Keep large documents and approved model artifacts in encrypted object storage with lifecycle policies and access controls. Do not put attachments in JSON arrays inside patient rows.</li>
+<li>Remove clinical records and access tokens from persistent browser localStorage. Use an approved session design, narrow browser caching and protected server-side token handling.</li>
+<li>Replace whole-array patient updates with granular, versioned operations. Use optimistic concurrency to prevent one clinician overwriting another's changes.</li>
+</ul>
+<h2 id="production-data-model">Production data model</h2>
+<p>The expanded workbook is a starting specification, not an exact production schema. The demo uses a smaller subset and lacks important temporal/clinical metadata.</p>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Minimum important properties</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Organization/site</td>
+<td>Tenant ID, site ID, approved endpoints and configuration version</td>
+</tr>
+<tr>
+<td>Patient and identity link</td>
+<td>Internal ID, source-system identifiers, matching provenance, demographic history</td>
+</tr>
+<tr>
+<td>Encounter</td>
+<td>Patient, site, care setting, start/end times and source identity</td>
+</tr>
+<tr>
+<td>Observation</td>
+<td>Code/system/version, numeric/text value, unit, effective time, availability time, source, method, status and correction linkage</td>
+</tr>
+<tr>
+<td>Condition</td>
+<td>Code, onset, recorded time, active/history/suspected/resolved state and evidence</td>
+</tr>
+<tr>
+<td>Medication record</td>
+<td>Ingredient/code, order versus reported use, dose/unit, route, frequency, effective dates and reconciliation state</td>
+</tr>
+<tr>
+<td>Allergy/adverse reaction</td>
+<td>Substance, reaction, status, severity/criticality and verification</td>
+</tr>
+<tr>
+<td>Care plan/task/check-in</td>
+<td>Patient, owner, due time, status, patient submission and separate clinical review event</td>
+</tr>
+<tr>
+<td>Consent/permission event</td>
+<td>Scope, version, recorded time, actor, status and revocation handling</td>
+</tr>
+<tr>
+<td>Assessment</td>
+<td>Endpoint/horizon, model/rule version, input snapshot, eligibility, result/uncertainty, calculated time and review</td>
+</tr>
+<tr>
+<td>Outcome</td>
+<td>Endpoint definition version, baseline eligibility, event/confirmation dates, last ascertainment, death and adjudication</td>
+</tr>
+<tr>
+<td>Audit/provenance</td>
+<td>Actor, tenant, action, object version, timestamp and source/reference identifiers</td>
+</tr>
+</tbody>
+</table>
+<p>Separate event/measurement time, time the result became available, ingestion time and correction time. Preserve both original and normalized values and units. A later correction must not silently rewrite the historical input to a past prediction. Missing must remain distinct from zero, normal and negative.</p>
+<p>The demo's review flag is not a production audit trail. Its simple six-month display and latest-value lookup do not constitute a validated feature-selection algorithm. Add per-variable lookback rules, specimen context, duplicate handling and confirmed temporal eligibility before clinical inference.</p>
+<h2 id="hospital-integration">Hospital integration</h2>
+<p>Begin with a site capability assessment: supported FHIR version/profiles, authorization options, available resources and fields, lab coding/units, historic coverage, correction behavior, identifiers, network requirements, rate limits and vendor approvals. FHIR support alone does not guarantee interoperable clinical meaning.</p>
+<p>Prefer an agreed FHIR interface, often R4 where supported by the partner. Discover and validate the partner's CapabilityStatement and required implementation guides instead of assuming every server supports the same operations. <a href="https://hl7.org/fhir/R4/overview-arch.html">FHIR R4 architecture</a></p>
+<table>
+<thead>
+<tr>
+<th>VitalCKM concept</th>
+<th>Candidate FHIR representation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Patient demographics</td>
+<td>Patient</td>
+</tr>
+<tr>
+<td>Visits and care setting</td>
+<td>Encounter</td>
+</tr>
+<tr>
+<td>BP, HbA1c, creatinine, eGFR, UACR and weight</td>
+<td>Observation; DiagnosticReport for report context</td>
+</tr>
+<tr>
+<td>Diagnoses and history</td>
+<td>Condition</td>
+</tr>
+<tr>
+<td>Prescribed medication</td>
+<td>MedicationRequest</td>
+</tr>
+<tr>
+<td>Reported medication use/adherence context</td>
+<td>MedicationStatement and appropriate workflow-specific data</td>
+</tr>
+<tr>
+<td>Allergies</td>
+<td>AllergyIntolerance</td>
+</tr>
+<tr>
+<td>Care plans, goals and work items</td>
+<td>CarePlan, Goal, Task</td>
+</tr>
+<tr>
+<td>Patient questionnaires/check-ins</td>
+<td>QuestionnaireResponse, with reviewed clinical facts represented separately</td>
+</tr>
+<tr>
+<td>Care team and providers</td>
+<td>CareTeam, Practitioner, PractitionerRole, Organization</td>
+</tr>
+<tr>
+<td>Approved risk output</td>
+<td>RiskAssessment, with provenance and the agreed local profile</td>
+</tr>
+<tr>
+<td>Consent, audit and source lineage</td>
+<td>Consent, AuditEvent, Provenance</td>
+</tr>
+</tbody>
+</table>
+<p>These are candidate mappings requiring profile-level implementation and clinical review; they are not implemented endpoints. A prescription does not prove medication use, and a questionnaire response is not a confirmed diagnosis.</p>
+<p>Use SMART App Launch for an embedded EHR workflow when supported, with the relevant patient/encounter launch context and least-privilege scopes. Use a separately authorized backend-services pattern for unattended integration. Keep access and refresh tokens out of application logs. <a href="https://hl7.org/fhir/smart-app-launch/">SMART App Launch</a></p>
+<p>Use FHIR Bulk Data export where supported and authorized for population extraction; it is distinct from ordinary patient-level API requests. Handle asynchronous export, protected downloads, pagination/checkpoints and expiring credentials according to the partner's supported guide. <a href="https://hl7.org/fhir/uv/bulkdata/">FHIR Bulk Data</a></p>
+<p>Where FHIR is unavailable, support a documented HL7 v2 laboratory/encounter interface or a controlled CSV/SFTP extraction with the hospital's integration team. Implement a site-specific adapter rather than pretending a legacy feed is already FHIR. Retain provenance through normalization.</p>
+<h3 id="integration-correctness-requirements">Integration correctness requirements</h3>
+<ul>
+<li>Map local lab/diagnosis/medication codes to approved terminology, retaining original codes and mapping versions. Use LOINC and UCUM where applicable and supported; verify units and the actual analyte.</li>
+<li>Process corrections, cancellations, amended results and duplicate deliveries. Use source-system plus source-record/version keys for idempotency.</li>
+<li>Do not lose events during outages. Use durable queues, bounded retries, dead-letter handling, replay and reconciliation checkpoints.</li>
+<li>Support patient merges/splits through a governed identity workflow. Ensure cross-tenant records cannot be associated by accident.</li>
+<li>Keep imported medication orders separate from patient-reported adherence and actual administration.</li>
+<li>Start read-only. Add EHR write-back only after agreeing on ownership, review, workflow status, duplicate prevention and audit semantics. Do not create medication orders from a model result automatically.</li>
+</ul>
+<h3 id="site-acceptance-procedure">Site acceptance procedure</h3>
+<ol>
+<li>Agree on the minimum dataset, intended use and access boundaries.</li>
+<li>Integrate the vendor sandbox with synthetic records.</li>
+<li>Reconcile an approved small sample against source records. A planning sample of 50–100 patients can reveal mapping problems but is not statistical evidence of clinical validity.</li>
+<li>Include corrected labs, missing units, duplicate messages, patient merges, revoked access, outage replay and unknown terminology.</li>
+<li>Demonstrate no unintended cross-patient/tenant exposure, preservation of source values and dates, and controlled handling of unresolved mapping cases.</li>
+<li>Perform a bounded read-only pilot with responsible clinical and IT owners.</li>
+</ol>
+<h2 id="clinical-model-service-and-research-separation">Clinical model service and research separation</h2>
+<p>Keep fixed calculations and outcome models separately versioned. A proposed assessment contract should include patient/tenant context, prediction time, model version, endpoint/horizon, eligibility, feature values with units and timestamps, and a reproducible snapshot reference. An unavailable result returns a specific reason and no fabricated numeric probability.</p>
+<p>Train models in an isolated research environment with approved data. The production application does not train itself on incoming hospital data. Use frozen dataset manifests, code versions, dependency environments and reproducible seeds. Register approved artifacts, training population, endpoint definitions, performance reports, calibration version and known limitations. Treat model updates as governed software releases.</p>
+<p>The development pipeline should support:</p>
+<ul>
+<li>Patient-grouped splits and site/temporal holdouts; all data from a patient remain within the intended partition.</li>
+<li>Feature availability at the index time; no outcome, post-index treatment or future result leakage.</li>
+<li>Preprocessing, imputation, feature selection and tuning within development folds.</li>
+<li>Parsimonious survival/regression comparators before complex ML, with model choice supported by event counts and incremental utility.</li>
+<li>Endpoint-appropriate censoring/competing-risk handling and fixed diagnostic confirmation rules.</li>
+<li>AUROC/time-dependent AUC, calibration, Brier score, threshold metrics, subgroup uncertainty and decision-curve analysis.</li>
+<li>Separate local adaptation and independent evaluation. Published equations, recalibrated equations and proprietary models need distinct labels and provenance.</li>
+</ul>
+<p>If model outputs later become features for another model, produce training inputs through out-of-fold predictions and repeat the entire pipeline within validation. Do not train a downstream model on in-sample predictions or future diagnoses. Avoid joint modeling until simpler approaches and valid evaluation establish a reason to add it.</p>
+<p>Sample-size planning and result-reporting details are in the accompanying business brief. The following original data counts remain the baseline: zero real training records and zero measured clinical AUC/accuracy results. Reporting should follow an appropriate prediction-model framework such as <a href="https://www.tripod-statement.org/">TRIPOD+AI</a>.</p>
+<h2 id="scaling-and-performance">Scaling and performance</h2>
+<p>Do not load every patient and every observation into the browser. Provide authorized paginated search, compact patient summaries and bounded date-window observation APIs. Index by tenant, patient, code and effective date. Keep raw history separate from derived read models and rebuild summaries when source corrections arrive.</p>
+<p>Use asynchronous jobs for population imports, exports and bulk assessment generation. Keep interactive reads isolated from bulk workloads. Cache only within correct tenant, patient, authorization and data-version boundaries. Start with one durable database and clear transaction boundaries; add replicas, partitions or service separation after measured contention justifies them.</p>
+<h3 id="proposed-load-test-scenarios-not-measured-capacity">Proposed load-test scenarios, not measured capacity</h3>
+<p>Assume 100 observations per patient solely for planning. Medication, task, audit and document volumes are additional.</p>
+<table>
+<thead>
+<tr>
+<th>Test stage</th>
+<th style="text-align: right;">Synthetic patients</th>
+<th style="text-align: right;">Observation rows</th>
+<th style="text-align: right;">Concurrent sessions</th>
+<th style="text-align: right;">Illustrative API request load</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single-site pilot</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: right;">100,000</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">10 requests/second</td>
+</tr>
+<tr>
+<td>Multi-clinic</td>
+<td style="text-align: right;">10,000</td>
+<td style="text-align: right;">1,000,000</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">50 requests/second</td>
+</tr>
+<tr>
+<td>Regional deployment</td>
+<td style="text-align: right;">100,000</td>
+<td style="text-align: right;">10,000,000</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">200 requests/second</td>
+</tr>
+</tbody>
+</table>
+<p>These are engineering test inputs, not promised supported traffic or requirements established by the current application. Synthetic load records must never be counted as clinical training evidence. Reproduce representative read/write mixes, result sizes, authentication overhead, hospital API latency, tenant distribution, batch imports and correction traffic. State hardware, database configuration, geography and dataset size in every benchmark.</p>
+<p>Candidate acceptance objectives for negotiation are: p95 core API latency below 1 second, p95 simple-model inference below 2 seconds, interactive error rate below 0.1% during an agreed sustained test, and successful replay without lost or duplicated clinical facts. These objectives have not been measured. Include soak tests, capacity saturation, queue backlog, memory use and failover; a short average-latency test is insufficient.</p>
+<h2 id="security-clinical-governance-and-reliability">Security, clinical governance and reliability</h2>
+<ul>
+<li>Replace role preview with real identity, hospital SSO where appropriate, patient linkage, least-privilege authorization and strong staff authentication.</li>
+<li>Encrypt approved data flows and storage, manage keys/secrets centrally, and separate development/test/production. Keep identifiable data out of logs, analytics and error-reporting payloads.</li>
+<li>Produce access and change audit trails with reviewable actor and object versions. Define retention, consent-related restrictions and revocation behavior with the organization.</li>
+<li>Resolve dependency advisories, scan artifacts and secrets, maintain dependency inventories, and establish supported upgrade versions before a patient-data pilot.</li>
+<li>Test backup restoration and disaster recovery. Agree recovery objectives, support hours, downtime behavior and incident ownership with each partner rather than implying the demo provides clinical availability.</li>
+<li>Define the intended clinical use and escalation workflow with clinical owners. The current demo is not an urgent symptom-monitoring service, automated diagnosis tool or prescribing system.</li>
+<li>Select deployment regions, data-sharing terms and any applicable approvals with the organization's privacy, legal, security and clinical governance teams. No compliance certification is claimed here.</li>
+</ul>
+<p>Monitor input missingness, unit/code drift, stale feeds, rejected records, unknown identities, processing lag, service errors and model availability. As outcomes mature, monitor calibration and performance by site and subgroup. Feature drift is not proof of performance drift. Use shadow evaluation, explicit approval and rollback for new models; never silently replace a production model or retrain it automatically.</p>
+<h2 id="delivery-sequence-for-the-technical-team">Delivery sequence for the technical team</h2>
+<ol>
+<li><strong>Refactor and stabilize:</strong> typed domain contracts, smaller UI components, dependency triage, source tests and accessible UI/end-to-end tests.</li>
+<li><strong>Add the secure backend:</strong> authorization, tenant-aware persistence, identity links, immutable provenance, audit and backup/restore tests.</li>
+<li><strong>Integrate one partner:</strong> read-only sandbox adapter, terminology mapping, reconciliation and failure/replay tests.</li>
+<li><strong>Develop and verify the model service:</strong> approved equations first, independent numeric verification, eligibility logic, model registry and locked evaluation artifacts.</li>
+<li><strong>Run a silent pilot:</strong> track data fidelity, operational reliability, review burden and patient/clinician workflow fit without activating unvalidated decision support.</li>
+<li><strong>Enable a bounded clinical use:</strong> only after clinical, security, integration and model acceptance gates pass.</li>
+<li><strong>Scale deliberately:</strong> execute documented load scenarios, measure bottlenecks, verify tenant isolation under concurrency, and onboard each additional site with its own mapping and validation.</li>
+</ol>
+<p>The most reusable assets today are the UI workflows, source code, synthetic scenario set, revised field dictionary and separation of measurement calculations from prediction models. The largest production work remains in secure persistence, identity/authorization, hospital adapters, endpoint-quality real data, and clinical validation.</p></body></html>

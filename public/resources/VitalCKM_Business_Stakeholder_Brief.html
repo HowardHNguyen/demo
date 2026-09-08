@@ -1,0 +1,295 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VitalCKM Business Stakeholder Brief</title><style>body{font:16px/1.7 system-ui,sans-serif;color:#10192b;max-width:1000px;margin:auto;padding:24px}h1,h2,h3{line-height:1.25;color:#10192b}h1{font-size:2rem}h2{margin-top:2em}a{color:#025bcd}table{display:block;overflow:auto;border-collapse:collapse;font-size:14px;margin:24px 0}th,td{border:1px solid #dbe2f0;padding:10px;text-align:left;min-width:110px}th{background:#eef3fc}pre{overflow:auto;padding:18px;background:#eef1f8;font-size:13px}blockquote{border-left:3px solid #6f1eb8;padding-left:16px}.release{background:#e5f2fd;padding:16px;border-radius:8px;font-size:14px}@media print{body{max-width:none;padding:0}table{display:table;font-size:10px}th,td{min-width:0}pre{white-space:pre-wrap}a{color:inherit}}</style></head><body><aside class="release">Planning baseline document. The current Azure demo also includes an educational Framingham 2008 reference calculator. Statements about disabled percentages describe the earlier release; no local clinical accuracy or AUC has been established.</aside><h1 id="vitalckm-business-stakeholder-brief">VitalCKM business stakeholder brief</h1>
+<p>Prepared 7 September 2026. Current implementation and proposed development plan are distinguished throughout.</p>
+<h2 id="executive-description">Executive description</h2>
+<p>VitalCKM Care demonstrates a shared cardiovascular, kidney and metabolic workspace for clinicians and patients. Clinicians can review measurements and histories, identify missing information, and manage follow-up. Patients can explore their measurements, record fictional check-ins, report medication adherence and complete goals. The business hypothesis is that a connected workflow can reduce fragmented review and support continuity of care. Improvements in health outcomes, clinician productivity and cost have not yet been demonstrated.</p>
+<p>The current product is a functioning demonstration, not a validated prediction platform or a hospital-ready clinical service. It uses synthetic records, browser-local storage and a role-preview switch. No real patient data, hospital integration, production authentication or trained prediction model is present.</p>
+<h2 id="what-can-be-demonstrated-today">What can be demonstrated today</h2>
+<ul>
+<li>A clinician patient directory with search, missing-measurement filtering and patient selection.</li>
+<li>Patient overview covering blood pressure, laboratory eGFR, HbA1c and BMI.</li>
+<li>Dated trends with original measurement units, sources and review states.</li>
+<li>Synthetic observation entry, medication adherence reporting, care-plan tasks and patient check-ins.</li>
+<li>Patient/clinician perspectives, JSON record export and printing of the visible view.</li>
+<li>Transparent BMI, urine ACR conversion, kidney measurement categories and a reference CKD-EPI 2021 creatinine eGFR calculation. These are fixed calculations, not learned AI models.</li>
+</ul>
+<h3 id="actual-evidence-available">Actual evidence available</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Current result</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Starter patients</td>
+<td>8 synthetic patients</td>
+<td>Demonstration scenarios, not a research cohort</td>
+</tr>
+<tr>
+<td>Starter observations</td>
+<td>270</td>
+<td>Repeated observations across those same 8 patients</td>
+</tr>
+<tr>
+<td>Medication entries</td>
+<td>9</td>
+<td>Fictional medication histories</td>
+</tr>
+<tr>
+<td>Care-plan items</td>
+<td>16</td>
+<td>Demonstration workflow records</td>
+</tr>
+<tr>
+<td>Real patients used for model training</td>
+<td>0</td>
+<td>No model development has occurred</td>
+</tr>
+<tr>
+<td>Trained outcome-prediction models</td>
+<td>0</td>
+<td>PREVENT, KFRE and incident diabetes prediction are not enabled</td>
+</tr>
+<tr>
+<td>Automated software tests</td>
+<td>9 passed</td>
+<td>Selected calculation, boundary, validation and data tests passed</td>
+</tr>
+<tr>
+<td>Production compilation and TypeScript checks</td>
+<td>Passed</td>
+<td>The source builds; this does not establish clinical readiness</td>
+</tr>
+<tr>
+<td>Clinical accuracy, AUROC, AUPRC, sensitivity and specificity</td>
+<td>Not available</td>
+<td>No trained model has been evaluated against real outcomes</td>
+</tr>
+<tr>
+<td>Clinical calibration, Brier score and net benefit</td>
+<td>Not available</td>
+<td>Not measured</td>
+</tr>
+<tr>
+<td>Measured hospital-scale capacity or clinical impact</td>
+<td>Not available</td>
+<td>Not tested</td>
+</tr>
+</tbody>
+</table>
+<p>The separate supplied sample workbook contains 50 synthetic rows. Those rows are not the same as the app's eight scenarios and are not additional clinical validation evidence. A nine-of-nine software test result must never be described as 100% diagnostic accuracy. Performance claims on an existing company website or from unrelated studies cannot be attributed to this demo.</p>
+<h2 id="what-to-train-and-what-not-to-train">What to train and what not to train</h2>
+<p>Do not train a model to reproduce BMI, eGFR equations or unit conversions. Implement those deterministically and verify their software implementation. Validate an existing published risk model before deciding whether a new proprietary model adds value.</p>
+<table>
+<thead>
+<tr>
+<th>Proposed model</th>
+<th>Intended population</th>
+<th>Target and horizon</th>
+<th>Required outcome evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary-prevention CVD model</td>
+<td>Adults eligible for the selected model, without the relevant baseline clinical CVD</td>
+<td>A precisely defined first cardiovascular event, initially at a supported horizon such as 5 or 10 years</td>
+<td>Adjudicated event dates and components, follow-up and death</td>
+</tr>
+<tr>
+<td>Incident type 2 diabetes model</td>
+<td>People without diabetes at the prediction date</td>
+<td>New confirmed T2D within a selected supported horizon</td>
+<td>Diagnosis criteria, confirmatory tests, dates and follow-up</td>
+</tr>
+<tr>
+<td>Incident CKD model</td>
+<td>People without established CKD at baseline</td>
+<td>New sustained CKD under a frozen protocol</td>
+<td>Repeated renal results, chronicity evidence and adjudication</td>
+</tr>
+<tr>
+<td>CKD progression or kidney-failure model</td>
+<td>People with established CKD who meet the model's eligibility criteria</td>
+<td>A defined sustained decline or kidney failure; KFRE addresses a specific kidney-failure question</td>
+<td>Serial renal data, dialysis/transplant events, confirmation and competing death</td>
+</tr>
+</tbody>
+</table>
+<p>Start with one well-defined cardiovascular use case and published comparators. Add the diabetes and kidney endpoints when the data support them. Do not merge incident CKD and progression in existing CKD into one ambiguous label. Do not promise one universal CKM score.</p>
+<p>For custom models, begin with a parsimonious regression or survival model, then compare carefully regularized tree-based methods. A small cohort does not justify deep learning simply because the product uses the term AI. Explanations identify associations or model contributions; they do not establish causal treatment benefits.</p>
+<h2 id="training-and-testing-record-counts">Training and testing record counts</h2>
+<p>Count unique eligible patients and confirmed outcome events separately from rows. One person with 100 measurements is still one independent patient for splitting and much of the sample-size planning.</p>
+<p>The following is an <strong>illustrative budgeting scenario, not an established sample-size requirement or an observed event rate</strong>. Assume 80% of eligible patients form the development cohort and 20% form a locked temporal or site-held-out test cohort. Within development, use grouped resampling for tuning and internal validation. Patients and all their visits stay in one partition.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Eligible unique patients</th>
+<th style="text-align: right;">Development patients</th>
+<th style="text-align: right;">Locked test patients</th>
+<th style="text-align: right;">Expected test events at 10%</th>
+<th style="text-align: right;">At 5%</th>
+<th style="text-align: right;">At 2%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">5,000</td>
+<td style="text-align: right;">4,000</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr>
+<td style="text-align: right;">10,000</td>
+<td style="text-align: right;">8,000</td>
+<td style="text-align: right;">2,000</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">40</td>
+</tr>
+<tr>
+<td style="text-align: right;">25,000</td>
+<td style="text-align: right;">20,000</td>
+<td style="text-align: right;">5,000</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td style="text-align: right;">50,000</td>
+<td style="text-align: right;">40,000</td>
+<td style="text-align: right;">10,000</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">200</td>
+</tr>
+</tbody>
+</table>
+<p>For example, a 25,000-patient cohort with an assumed 10% event proportion would contain approximately 2,000 development events and 500 test events. At 2%, those counts fall to 400 and 100. Actual analyzable counts can be lower after eligibility exclusions, missing outcome ascertainment and censoring. Do not substitute these arithmetic proportions for a survival sample-size calculation.</p>
+<p>The 80/20 split is a planning illustration. Do not automatically waste a large portion of a small cohort on an underpowered test set. A statistician should choose between efficient internal validation and an adequately sized independent test design. Calculate development and external-validation requirements for each endpoint using event frequency, follow-up, censoring, candidate parameter complexity, anticipated performance and desired confidence-interval precision. A fixed 10-events-per-variable rule or 100/200-event validation rule is not a sufficient justification. <a href="https://www.bmj.com/content/384/bmj-2023-074821">External-validation sample-size methods</a></p>
+<p>An external validation cohort is a separate evaluation budget, not the same 20% internal test set. After any model is recalibrated on local data, assess the updated model on a further untouched cohort or suitable resampling design; do not call performance on the adaptation data external validation.</p>
+<h3 id="how-mesa-fits">How MESA fits</h3>
+<p>MESA originally enrolled 6,814 adults aged 45–84 without known CVD at baseline. The actual approved delivery, usable endpoints and eligible subset will determine the available research sample. Repeated examinations do not multiply the independent participant count. MESA can support valuable model evaluation and, where justified, development, but it does not by itself validate performance in Vietnamese clinics, younger adults or secondary prevention. <a href="https://mesa-nhlbi.org/about/overview">MESA overview</a></p>
+<p>With MESA, first audit the delivered tables, variables, endpoint definitions, event counts and permitted uses. Benchmark existing models, then decide whether recalibration or new development is justified. Obtain a local hospital cohort for transportability assessment and external validation before making Vietnam-specific performance claims.</p>
+<h2 id="how-training-and-evaluation-should-work">How training and evaluation should work</h2>
+<ol>
+<li>Freeze the intended user, clinical decision, eligible population, index date, endpoint definition and horizon.</li>
+<li>Audit data provenance, duplicates, units, missingness, loss to follow-up and event adjudication.</li>
+<li>Freeze patient-level and preferably temporal/site-based partitions before model selection. Fit imputers, preprocessing and feature selection only within training folds.</li>
+<li>Compare a published applicable model and a simple baseline against candidate proprietary models using the same eligible cohort and endpoint. Existing equations are benchmarks, not automatically trained anew.</li>
+<li>Select the model and operating threshold inside development data. Address death and censoring with appropriate time-to-event methods; a short event-free follow-up is not a negative 10-year label.</li>
+<li>Evaluate the locked model once on untouched data. Report uncertainty, calibration and operational burden, not just a favorable AUC.</li>
+<li>Conduct independent local validation and a prospective silent pilot. A short silent pilot tests workflow and data movement; it cannot produce ten-year outcome validation in a few months.</li>
+<li>Introduce clinically approved decision support under oversight, then measure care-process and patient outcomes in a suitable prospective study.</li>
+</ol>
+<h2 id="what-performance-to-report">What performance to report</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Business meaning</th>
+<th>Required context</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AUROC or time-dependent AUC</td>
+<td>Ability to rank people who experience the endpoint above those who do not</td>
+<td>Endpoint, horizon, censoring method and 95% confidence interval</td>
+</tr>
+<tr>
+<td>AUPRC</td>
+<td>Precision/recall performance when events are uncommon</td>
+<td>Event prevalence, horizon and appropriate survival handling</td>
+</tr>
+<tr>
+<td>Sensitivity and specificity</td>
+<td>Events identified versus non-events correctly excluded</td>
+<td>A threshold selected before final testing</td>
+</tr>
+<tr>
+<td>PPV and NPV</td>
+<td>How often positive/negative results are correct</td>
+<td>Prevalence and threshold in the deployment population</td>
+</tr>
+<tr>
+<td>Calibration plot, slope and intercept or observed/expected ratio</td>
+<td>Whether stated probabilities match observed frequencies</td>
+<td>Overall and clinically important risk ranges</td>
+</tr>
+<tr>
+<td>Brier score</td>
+<td>Overall probability prediction error</td>
+<td>Time horizon and censoring adjustment where needed</td>
+</tr>
+<tr>
+<td>Decision-curve net benefit</td>
+<td>Whether acting on the model may improve decision-making relative to alternatives</td>
+<td>Clinically justified thresholds and comparator strategies</td>
+</tr>
+<tr>
+<td>Review burden</td>
+<td>Number of flagged patients and false positives the team must handle</td>
+<td>For example, flags per 1,000 assessments</td>
+</tr>
+<tr>
+<td>Subgroup performance</td>
+<td>Whether results generalize across patient groups</td>
+<td>Sample/event counts and confidence intervals per group/site</td>
+</tr>
+</tbody>
+</table>
+<p>Use TRIPOD+AI to structure transparent reporting. These reporting practices do not certify safety or regulatory compliance. <a href="https://www.tripod-statement.org/">TRIPOD+AI</a></p>
+<h3 id="why-accuracy-alone-is-misleading">Why accuracy alone is misleading</h3>
+<p><strong>Hypothetical example only; not VitalCKM results:</strong> among 1,000 patients with 100 events, a classifier with 80% sensitivity and 85% specificity produces 80 true positives, 20 false negatives, 765 true negatives and 135 false positives. Accuracy is 84.5%, PPV is 37.2%, and 215 patients are flagged. An always-negative classifier would have 90% accuracy while missing every event. AUROC cannot be derived from this one confusion matrix; it requires ranked predictions across thresholds.</p>
+<p>There is no defensible promised AUC for an untrained model. Agree on clinical operating requirements after establishing baseline performance and stakeholder costs of errors. An AUC target alone is not a launch criterion. Avoid publishing arbitrary targets such as “98% accuracy” or “AUC above 0.90” as expected results.</p>
+<h3 id="model-results-template">Model results template</h3>
+<p>For each future model, publish: version, intended use, data source and dates, eligible patient count, event count, follow-up/censoring summary, validation design, AUROC/time-AUC and CI, AUPRC, calibration, Brier score, threshold, sensitivity, specificity, PPV, NPV, flags per 1,000, subgroup results and limitations. For the current demo every clinical prediction result is <strong>not available</strong>.</p>
+<h2 id="commercial-and-operational-milestones">Commercial and operational milestones</h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Proposed scope</th>
+<th>What success establishes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Product discovery</td>
+<td>Approximately 5–10 clinicians and 10–20 representative patient participants using synthetic scenarios</td>
+<td>Usability and workflow relevance, not clinical effectiveness</td>
+</tr>
+<tr>
+<td>Integration pilot</td>
+<td>One hospital/clinic, initially read-only, with a small approved reconciliation sample</td>
+<td>Correct identity matching, mapping and workflow access</td>
+</tr>
+<tr>
+<td>Model research</td>
+<td>Endpoint-specific real cohorts sized using formal calculations</td>
+<td>Retrospective performance within stated populations</td>
+</tr>
+<tr>
+<td>Silent prospective pilot</td>
+<td>One or two sites, scope/duration agreed with clinical owners</td>
+<td>Data freshness, review burden, reliability and workflow fit</td>
+</tr>
+<tr>
+<td>Controlled clinical rollout</td>
+<td>Bounded intended use and trained staff</td>
+<td>Real-world utility and safety monitoring under governance</td>
+</tr>
+<tr>
+<td>Expansion</td>
+<td>Additional sites with independent mapping and validation</td>
+<td>Transportability and sustainable operations</td>
+</tr>
+</tbody>
+</table>
+<p>Measure time to assemble a patient summary, missing-test detection, follow-up completion, user task success, patient understanding and clinician adoption. Do not claim reduced admissions, improved renal outcomes or cost savings without a suitable outcomes study. Revenue models such as clinic subscriptions or per-patient contracts remain commercial hypotheses until pilot value, procurement needs and delivery costs are established.</p>
+<p>Business approval should fund the next evidence-producing milestone: clinical leadership, statistical planning, secure integration and a controlled pilot. The demonstration already helps stakeholders agree on the workflow while real data access is pending.</p></body></html>
