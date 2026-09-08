@@ -11,7 +11,7 @@ import {riskPercent,riskError,riskBand,comparisons,RISK_SOURCE,RISK_VERSION,type
 import {profileFromPatient,inputSources,staleInputs,recordChanges,makeAssessment,patientHistory} from '@/lib/patient-workflow';
 import {type Patient} from '@/lib/demo';
 import type {RiskView} from './risk-workspace';
-const pct=(n:number|null)=>n===null?'Unavailable':`${n.toFixed(1)}%`;
+const pct=(n:number|null)=>n===null?'—':`${n.toFixed(1)}%`;
 const pp=(n:number)=>`${n>0?'+':''}${n.toFixed(1)} pp`;
 function Pick({label,value,onChange,options}:{label:string;value:string;onChange:(x:string)=>void;options:string[]}){return <label className="risk-field"><span>{label}</span><Select value={value} onValueChange={v=>v!==null&&onChange(String(v))}><SelectTrigger aria-label={label}><SelectValue>{value}</SelectValue></SelectTrigger><SelectContent>{options.map(x=><SelectItem value={x} key={x}>{x}</SelectItem>)}</SelectContent></Select></label>}
 function exportCsv(patientId:string,records:PatientAssessment[]){const rows=[['patient_id','saved_at','kind','risk_percent','model','age','sex','sbp_mmHg','tc_mg_dL','hdl_mg_dL'],...records.map(a=>[patientId,a.date,a.kind,riskPercent(a.profile)?.toFixed(4)??'',a.version,a.profile.age,a.profile.sex,a.profile.sbp,a.profile.tc,a.profile.hdl])];const csv=rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const u=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));const a=document.createElement('a');a.href=u;a.download=patientId+'-assessments.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
