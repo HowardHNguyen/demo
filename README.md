@@ -19,6 +19,7 @@ The intended value is continuity between a patient's health dashboard and the cl
 | Risk Over Time | Patient-specific assessment history with preserved inputs and calculation version; hypothetical scenarios stay outside the actual assessment trajectory |
 | What-If | Recalculates a hypothetical profile and saves it separately from recorded measurements |
 | My Care Plan | Goals, check-ins, medication-adherence entries, and discussion tasks linked to an assessment or scenario |
+| Care Priorities & Outreach | Population worklist with four demo priorities, a separate data-quality queue, clinical review, team assignment, and simulated outreach |
 | Clinician review | Demonstration review markers and timestamps for observations and records |
 | Research Lab | Synthetic training, validation, and test results, assumptions, and downloadable research artifacts |
 | Resources and exports | Planning documents, patient JSON exports, assessment CSV exports, and browser Print / Save as PDF |
@@ -35,6 +36,26 @@ The intended value is continuity between a patient's health dashboard and the cl
 New measurements are appended; the original synthetic baseline remains unchanged. Saved assessments preserve their input snapshot and sources. Missing predictors and unknown history do not silently become normal values. A hypothetical improvement does not become an achieved measurement or an automatic treatment order.
 
 The patient/clinician switch is a simulated perspective switch, **not authentication**. Changes are stored in the current browser's localStorage, with patient-specific persistence for modified generated records. They do not synchronize across users, devices, browsers, or origins. Clearing browser storage removes local edits; reset restores the demonstration state.
+
+## Care Priorities & Outreach
+
+In **Clinician** view, open **Care Priorities & Outreach** from the sidebar. The worklist evaluates all 5,000 generated patients and the available workspace profiles, including locally edited records. Each patient has separate cardiovascular, kidney, and metabolic indicators; the highest actionable priority determines queue position.
+
+| Group | Meaning in the demo |
+|---|---|
+| P1 — Urgent clinical review | Findings needing prompt review of clinical context and the appropriate escalation pathway |
+| P2 — Priority follow-up | Findings meeting the demo's earlier-follow-up rules |
+| P3 — Scheduled monitoring | Ongoing abnormalities, recorded conditions, or current smoking requiring follow-up |
+| P4 — Routine prevention | No supported flags in complete, recent, reviewed core measurements; not a certification of good health |
+| Data quality queue | Missing, stale, invalid, unsupported-unit, future-dated, or unreviewed measurements; may overlap with P1–P3 |
+
+This is an **unvalidated, rules-based workflow simulation**, separate from both the Framingham calculator and the synthetic-trained ML experiment. It is not a clinical triage service. Its thresholds and response targets require clinical approval before real use. Symptoms are not assessed, and the initial rules do not cover every one of the 53 attributes.
+
+The worklist supports search, priority/domain/team/status filters, review dates and overdue status. Open a case to inspect the flag reasons and source measurements, record a clinical review, assign a team, preview a generic message, log simulated contact attempts, arrange a fictional appointment, and resolve or reopen with a note. A care-coordinator/admin perspective demonstrates coordination permissions; clinical review and resolution require the clinician perspective. These are UI workflow boundaries, not production authentication.
+
+No emails are sent, no recipient addresses are collected, and no appointments are booked. Urgent cases block the email simulation and direct the user to the simulated phone/escalation workflow. Contact requires review of current evidence and an assigned owner. An unsuccessful contact attempt does not resolve a case. Changed evidence reopens a case and invalidates its previous review while preserving activity history. What-If records never trigger alerts.
+
+Queue activity is browser-local under `vitalckm-outreach-v1` and is removed by **Reset demo**. The page evaluates records when opened; it does not monitor in the background or notify an actual care team. Full rule definitions, limitations, and production requirements are in the [care-priority workflow guide](public/resources/VitalCKM_Care_Priorities_and_Outreach.md), also summarized in the page's expandable rule explanation.
 
 ## Calculations and research are separate
 
@@ -120,7 +141,7 @@ AUROC describes ranking, while Brier score measures probability error; neither a
 
 The AUROC interval uses 500 patient bootstrap samples and reflects uncertainty within this synthetic experiment, not uncertainty about transport to real patients. Calibration bins and subgroup summaries are exploratory; no clinical calibration or fairness claim is made. The artificial first-or-recurrent-event endpoint also differs from the published calculator's endpoint, so these metrics must not be presented as validation of that calculator.
 
-The release passed **22 automated tests**, TypeScript checking, the Azure static export, and artifact checksum checks. These verify software and data behavior. Full interactive browser, load, security, prospective clinical, and health-outcome evaluations remain outstanding. Exact metrics and methods are available in [evaluation.json](public/research/evaluation.json) and the [research protocol](research/README.md).
+The release passed **35 automated tests**, TypeScript checking, the Azure static export, and artifact checksum checks. These verify software and data behavior. Full interactive browser, load, security, prospective clinical, and health-outcome evaluations remain outstanding. Exact metrics and methods are available in [evaluation.json](public/research/evaluation.json) and the [research protocol](research/README.md).
 
 ## Current architecture
 
@@ -154,7 +175,8 @@ Offline Python generator / training → versioned data, model, and evaluation fi
 | [app/](app/) and [components/](components/) | Screens, theme, and reusable interface components |
 | [lib/clinical.ts](lib/clinical.ts), [lib/risk.ts](lib/risk.ts) | Reference calculations and eligibility checks |
 | [lib/patient-workflow.ts](lib/patient-workflow.ts) | Connected assessment and patient-record behavior |
-| [public/cohort/](public/cohort/) | Generated patient index and patient data files |
+| [public/cohort/](public/cohort/) | Generated patient index, compact care-priority observations, and patient data files |
+| [lib/care-priorities.ts](lib/care-priorities.ts) | Explainable demo rules, evidence matching, and outreach transition checks |
 | [research/](research/) | Generator, training script, source schema, and methodology |
 | [public/research/](public/research/) | Baseline data, observations, outcomes, splits, predictions, model, evaluation, and checksums |
 | [public/resources/](public/resources/) | Stakeholder and technical documents |

@@ -4,6 +4,7 @@ import './globals.css';
 import './care.css';
 import './workflow.css';
 import './risk.css';
+import './priorities.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

@@ -1,6 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, copyFileSync } from 'node:fs';
 
+const careIndex = spawnSync(process.execPath, ['scripts/build-care-index.mjs'], { stdio: 'inherit' });
+if (careIndex.error) throw careIndex.error;
+if (careIndex.status !== 0) process.exit(careIndex.status ?? 1);
+
 const result = spawnSync(process.execPath, ['node_modules/vinext/dist/cli.js', 'build'], {
   stdio: 'inherit',
   env: { ...process.env, VITALCKM_AZURE_BUILD: '1' },
