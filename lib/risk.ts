@@ -3,7 +3,7 @@
  */
 export const RISK_VERSION='FHS-2008-lipids-v1';
 export const RISK_SOURCE='https://www.framinghamheartstudy.org/fhs-for-researchers/fhs-risk-functions/cardiovascular-disease-10-year-risk/';
-export type RiskProfile={age:number;sex:'Female'|'Male';sbp:number;tc:number;hdl:number;treated:boolean;smoker:boolean;diabetes:boolean;cvd:boolean;acute:boolean;bmi:number;ldl:number;glucose:number;heartRate:number};
+export type RiskProfile={age:number;sex:'Female'|'Male';sbp:number;tc:number;hdl:number;treated:boolean|null;smoker:boolean|null;diabetes:boolean|null;cvd:boolean|null;acute:boolean;bmi:number;ldl:number;glucose:number;heartRate:number};
 export const EXAMPLE:RiskProfile={age:55,sex:'Male',sbp:144,tc:210,hdl:50,treated:true,smoker:true,diabetes:false,cvd:false,acute:false,bmi:27,ldl:120,glucose:90,heartRate:70};
 export function riskError(p:RiskProfile):string|null {
  if(!p||!['Female','Male'].includes(p.sex))return 'Select the sex used by the published equation.';
@@ -11,7 +11,7 @@ export function riskError(p:RiskProfile):string|null {
  if(p.cvd)return 'No estimate: this primary-prevention equation excludes established cardiovascular disease, including prior heart attack, stroke or heart failure.';
  if(p.acute)return 'No estimate during an acute illness. This demonstration requires a stable baseline.';
  if(!Number.isInteger(p.age)||p.age<30||p.age>74)return 'This equation applies to ages 30–74 only.';
- for(const [key,min,max] of [['sbp',90,200],['tc',100,400],['hdl',20,100],['bmi',15,60],['ldl',20,350],['glucose',40,400],['heartRate',40,180]] as const){if(!Number.isFinite(p[key])||p[key]<min||p[key]>max)return `Check ${key}: enter a value from ${min} to ${max}. These are demo input bounds, not normal ranges.`;}
+ for(const [key,min,max] of [['sbp',90,200],['tc',100,400],['hdl',20,100]] as const){if(!Number.isFinite(p[key])||p[key]<min||p[key]>max)return `Check ${key}: enter a value from ${min} to ${max}. These are demo input bounds, not normal ranges.`;}
  if(p.hdl>=p.tc)return 'HDL must be below total cholesterol.';
  return null;
 }
@@ -32,3 +32,6 @@ export function comparisons(p:RiskProfile){const base=riskPercent(p);if(base===n
 export type Assessment={id:string;date:string;profile:RiskProfile;version:string};
 export function validAssessment(x:unknown):x is Assessment{if(!x||typeof x!=='object')return false;const a=x as Assessment;return typeof a.id==='string'&&typeof a.date==='string'&&Number.isFinite(Date.parse(a.date))&&a.version===RISK_VERSION&&riskError(a.profile)===null;}
 export function exampleHistory():Assessment[]{return [154,149,144].map((sbp,i)=>({id:`example-${i}`,date:`2026-0${6+i}-20T09:00:00.000Z`,profile:{...EXAMPLE,sbp,tc:230-i*10},version:RISK_VERSION}));}
+
+export type InputSource={id:string;date:string;source:string;reviewed:boolean;value:number;unit:string};
+export type PatientAssessment=Assessment&{patientId:string;kind:'assessment'|'scenario';sources:Record<string,InputSource>;savedBy:string;reviewedAt?:string;linkedAssessmentId?:string;baselineProfile?:RiskProfile};

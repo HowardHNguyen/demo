@@ -1,0 +1,488 @@
+[
+  [
+    "1",
+    "PATIENT_ID",
+    "Identifier",
+    "string",
+    "SYNTH-0001 ... SYNTH-0050",
+    "Required",
+    "Synthetic row identifier for this sample file only \u2014 not a real MRN or hospital ID."
+  ],
+  [
+    "2",
+    "SEX",
+    "Demographics & Anthropometrics",
+    "int",
+    "1=Male, 2=Female",
+    "Required",
+    "Biological sex (or sex assigned at birth)"
+  ],
+  [
+    "3",
+    "AGE",
+    "Demographics & Anthropometrics",
+    "int",
+    "18\u201395",
+    "Required",
+    "Age at index visit in years"
+  ],
+  [
+    "4",
+    "ETHNICITY",
+    "Demographics & Anthropometrics",
+    "string",
+    "1=Kinh,2=Tay,3=Thai,4=Muong,5=Khmer,6=Hoa,7=Other",
+    "Optional",
+    "Self-reported ethnicity"
+  ],
+  [
+    "5",
+    "HEIGHT_CM",
+    "Demographics & Anthropometrics",
+    "float",
+    "130.0\u2013200.0 cm",
+    "Required",
+    "Height at index visit (standing, no shoes)"
+  ],
+  [
+    "6",
+    "WEIGHT_KG",
+    "Demographics & Anthropometrics",
+    "float",
+    "25.0\u2013180.0 kg",
+    "Required",
+    "Weight at index visit (light clothing, no shoes). BMI is computed downstream from HEIGHT_CM and WEIGHT_KG, not requested as its own column."
+  ],
+  [
+    "7",
+    "WAIST_CIRC_CM",
+    "Demographics & Anthropometrics",
+    "float",
+    "50.0\u2013160.0 cm",
+    "Optional",
+    "Waist circumference"
+  ],
+  [
+    "8",
+    "WAIST_HIP_RATIO",
+    "Demographics & Anthropometrics",
+    "float",
+    "0.6\u20131.3",
+    "Optional",
+    "Waist-to-hip ratio"
+  ],
+  [
+    "9",
+    "SMOKING_STATUS",
+    "Demographics & Anthropometrics",
+    "int",
+    "0=Never,1=Former,2=Current",
+    "Required",
+    "Smoking status at index visit"
+  ],
+  [
+    "10",
+    "SYSBP",
+    "Vital Signs",
+    "float",
+    "70\u2013250 mmHg",
+    "Required",
+    "Systolic blood pressure at index visit"
+  ],
+  [
+    "11",
+    "DIABP",
+    "Vital Signs",
+    "float",
+    "40\u2013150 mmHg",
+    "Required",
+    "Diastolic blood pressure at index visit"
+  ],
+  [
+    "12",
+    "HEARTRTE",
+    "Vital Signs",
+    "float",
+    "30\u2013200 bpm",
+    "Required",
+    "Resting heart rate at index visit"
+  ],
+  [
+    "13",
+    "TOTCHOL",
+    "Laboratory \u2014 Lipid/Glycemic",
+    "float",
+    "2.6\u201313.0 mmol/L",
+    "Required",
+    "Total cholesterol"
+  ],
+  [
+    "14",
+    "HDLC",
+    "Laboratory \u2014 Lipid/Glycemic",
+    "float",
+    "0.3\u20135.0 mmol/L",
+    "Required",
+    "HDL cholesterol"
+  ],
+  [
+    "15",
+    "LDLC",
+    "Laboratory \u2014 Lipid/Glycemic",
+    "float",
+    "0.5\u201313.0 mmol/L",
+    "Required",
+    "LDL cholesterol"
+  ],
+  [
+    "16",
+    "TRIGLYCERIDES",
+    "Laboratory \u2014 Lipid/Glycemic",
+    "float",
+    "0.3\u201317.0 mmol/L",
+    "Required",
+    "Fasting triglycerides"
+  ],
+  [
+    "17",
+    "GLUCOSE",
+    "Laboratory \u2014 Lipid/Glycemic",
+    "float",
+    "2.2\u201328.0 mmol/L",
+    "Required",
+    "Fasting plasma glucose"
+  ],
+  [
+    "18",
+    "HBA1C",
+    "Laboratory \u2014 Lipid/Glycemic",
+    "float",
+    "20\u2013140 mmol/mol",
+    "Required",
+    "Hemoglobin A1c"
+  ],
+  [
+    "19",
+    "OGTT_2HR_GLUCOSE",
+    "Laboratory \u2014 Lipid/Glycemic",
+    "float",
+    "2.2\u201328.0 mmol/L",
+    "Optional",
+    "2-hour post-load glucose (OGTT)"
+  ],
+  [
+    "20",
+    "EGFR",
+    "Renal Function",
+    "float",
+    "5.0\u2013150.0 mL/min/1.73m2",
+    "Required",
+    "Estimated glomerular filtration rate"
+  ],
+  [
+    "21",
+    "SERUM_CREATININE",
+    "Renal Function",
+    "float",
+    "20\u20131000 umol/L",
+    "Required",
+    "Raw serum creatinine"
+  ],
+  [
+    "22",
+    "BUN",
+    "Renal Function",
+    "float",
+    "1.0\u201350.0 mmol/L",
+    "Required",
+    "Blood urea nitrogen"
+  ],
+  [
+    "23",
+    "URINE_ACR",
+    "Renal Function",
+    "float",
+    "0\u20133000+ mg/g",
+    "Required",
+    "Urine albumin-to-creatinine ratio"
+  ],
+  [
+    "24",
+    "URINE_PROTEIN_DIPSTICK",
+    "Renal Function",
+    "string",
+    "Negative/Trace/1+/2+/3+/4+",
+    "Optional",
+    "Semi-quantitative urine protein dipstick"
+  ],
+  [
+    "25",
+    "CKD_STAGE",
+    "Renal Function",
+    "int",
+    "1\u20135",
+    "Required",
+    "KDIGO CKD stage (derived from eGFR + ACR)"
+  ],
+  [
+    "26",
+    "SERUM_POTASSIUM",
+    "Renal Function",
+    "float",
+    "2.0\u20138.0 mmol/L",
+    "Optional",
+    "Serum potassium"
+  ],
+  [
+    "27",
+    "SERUM_SODIUM",
+    "Renal Function",
+    "float",
+    "110\u2013160 mmol/L",
+    "Optional",
+    "Serum sodium"
+  ],
+  [
+    "28",
+    "HEMOGLOBIN",
+    "Renal Function",
+    "float",
+    "60\u2013200 g/L",
+    "Optional",
+    "Hemoglobin (CKD-associated anemia marker)"
+  ],
+  [
+    "29",
+    "DIABETES",
+    "Active Conditions / Diagnoses",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Diabetes diagnosis at index"
+  ],
+  [
+    "30",
+    "DIABETES_TYPE",
+    "Active Conditions / Diagnoses",
+    "int",
+    "1=T1,2=T2,3=Gestational,4=Other",
+    "Required (if DIABETES=1)",
+    "Diabetes subtype"
+  ],
+  [
+    "31",
+    "HYPERTENSION_DX",
+    "Active Conditions / Diagnoses",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Hypertension diagnosis at index"
+  ],
+  [
+    "32",
+    "CKD_DX",
+    "Active Conditions / Diagnoses",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Chronic kidney disease diagnosis"
+  ],
+  [
+    "33",
+    "AFIB_DX",
+    "Active Conditions / Diagnoses",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Atrial fibrillation diagnosis"
+  ],
+  [
+    "34",
+    "DYSLIPIDEMIA_DX",
+    "Active Conditions / Diagnoses",
+    "int",
+    "0=No,1=Yes",
+    "Optional",
+    "Formal dyslipidemia diagnosis"
+  ],
+  [
+    "35",
+    "NAFLD_DX",
+    "Active Conditions / Diagnoses",
+    "int",
+    "0=No,1=Yes",
+    "Optional",
+    "Non-alcoholic fatty liver disease diagnosis"
+  ],
+  [
+    "36",
+    "GOUT_DX",
+    "Active Conditions / Diagnoses",
+    "int",
+    "0=No,1=Yes",
+    "Optional",
+    "Gout/hyperuricemia diagnosis"
+  ],
+  [
+    "37",
+    "HEPATITIS_B_STATUS",
+    "Active Conditions / Diagnoses",
+    "int",
+    "0=Negative,1=Positive,2=Unknown",
+    "Optional",
+    "Chronic Hepatitis B status"
+  ],
+  [
+    "38",
+    "PRIOR_MI",
+    "Prior Events & Family History",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Prior myocardial infarction before index"
+  ],
+  [
+    "39",
+    "PRIOR_STROKE",
+    "Prior Events & Family History",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Prior cerebrovascular event before index"
+  ],
+  [
+    "40",
+    "FAMILY_HX_CVD",
+    "Prior Events & Family History",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Family history of premature CVD"
+  ],
+  [
+    "41",
+    "FAMILY_HX_DIABETES",
+    "Prior Events & Family History",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Family history of diabetes"
+  ],
+  [
+    "42",
+    "FAMILY_HX_CKD",
+    "Prior Events & Family History",
+    "int",
+    "0=No,1=Yes",
+    "Optional",
+    "Family history of kidney disease"
+  ],
+  [
+    "43",
+    "PRIOR_DIALYSIS_OR_TRANSPLANT",
+    "Prior Events & Family History",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Prior dialysis or kidney transplant at index"
+  ],
+  [
+    "44",
+    "GESTATIONAL_DIABETES_HX",
+    "Prior Events & Family History",
+    "string",
+    "0=No,1=Yes,NA=Male",
+    "Optional",
+    "History of gestational diabetes (female patients)"
+  ],
+  [
+    "45",
+    "BPMEDS",
+    "Medications at Index",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Currently on antihypertensive medication"
+  ],
+  [
+    "46",
+    "STATIN_USE",
+    "Medications at Index",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Currently on a statin"
+  ],
+  [
+    "47",
+    "ASPIRIN_USE",
+    "Medications at Index",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Currently on aspirin"
+  ],
+  [
+    "48",
+    "ANTIDIABETIC_ORAL_USE",
+    "Medications at Index",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Currently on oral antidiabetic medication"
+  ],
+  [
+    "49",
+    "INSULIN_USE",
+    "Medications at Index",
+    "int",
+    "0=No,1=Yes",
+    "Required",
+    "Currently on insulin"
+  ],
+  [
+    "50",
+    "NEPHROTOXIC_OR_HERBAL_MED_USE",
+    "Medications at Index",
+    "int",
+    "0=No,1=Yes,2=Unknown",
+    "Optional",
+    "Traditional/herbal medicine or nephrotoxic drug use"
+  ],
+  [
+    "51",
+    "PHYSICAL_ACTIVITY",
+    "Lifestyle",
+    "int",
+    "1=Sedentary,2=Light,3=Moderate,4=Vigorous",
+    "Required",
+    "Patient-reported activity level"
+  ],
+  [
+    "52",
+    "ALCOHOL_USE",
+    "Lifestyle",
+    "int",
+    "0=None,1=Light,2=Moderate,3=Heavy",
+    "Required",
+    "Alcohol consumption at index"
+  ],
+  [
+    "53",
+    "DIET_PATTERN",
+    "Lifestyle",
+    "int",
+    "1=Rice/high-sodium,2=Mixed,3=Fruit-veg/low-sodium,4=Other",
+    "Optional",
+    "Approximate dietary pattern"
+  ],
+  [
+    "54",
+    "BETEL_NUT_USE",
+    "Lifestyle",
+    "int",
+    "0=No,1=Yes",
+    "Optional",
+    "Current or past betel nut use"
+  ]
+]
