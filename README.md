@@ -282,3 +282,10 @@ The current release demonstrates the connected workflow and a reproducible synth
 - [Technical Architecture and Scaling](public/resources/VitalCKM_Technical_Architecture_and_Scaling.md)
 
 The three original planning documents are retained as historical references and predate the connected synthetic-cohort release. This README and the research protocol describe the current implementation and measured experiment.
+
+
+## AI Governance workspace
+
+Clinician navigation now includes a system registry, accountable-owner and review fields, incident handling, system-specific pause controls, workspace checks and exportable local decision history. High-severity incidents pause the affected workflow; resolving an incident does not automatically resume it. Implementation/evidence fingerprint changes require renewed review.
+
+These are browser-local demonstration controls, not authenticated clinical approvals or hospital-grade audit records. All systems remain unapproved for clinical deployment; live drift and real-world performance are not measured. See [AI_GOVERNANCE.md](AI_GOVERNANCE.md) for the walkthrough, evidence gaps and hospital implementation plan.

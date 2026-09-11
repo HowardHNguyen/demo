@@ -115,8 +115,10 @@ const actionLabels: Record<CareAction, string> = {
 export default function CarePriorities({
   patients,
   onOpen,
+  onAudit,
 }: {
   patients: Patient[];
+  onAudit?: (detail: unknown) => void;
   onOpen: (p: Patient) => void;
 }) {
   const [cohort, setCohort] = useState<CareInput[]>([]),
@@ -298,6 +300,7 @@ export default function CarePriorities({
         note,
         { owner, due, appointment },
       );
+      onAudit?.({patientId:active.p.id,actor,action,ruleVersion:CARE_VERSION,evaluation:active.e,before:saved.records[active.p.id],after:next});
       setSaved((s) => ({ ...s, records: { ...s.records, [active.p.id]: next } }));
       setNote("");
       setError("");
